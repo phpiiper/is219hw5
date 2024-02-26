@@ -1,22 +1,25 @@
+import pkgutil
+import importlib
 from app.commands import CommandHandler
-from app.commands.goodbye import GoodbyeCommand
-from app.commands.greet import GreetCommand
+from app.commands import Command
 
 class App:
-    def __init__(self):
+    def __init__(self): # Constructor
         self.command_handler = CommandHandler()
-        # Register commands here
-        self.command_handler.register_command("greet", GreetCommand())
-        self.command_handler.register_command("goodbye", GoodbyeCommand())
-
+    def load_plugins(self):
+        plugins_package = 'app.plugins'
+        for _, plugin_name, is_pkg in pkgutil.iter_modules([plugins_package.replace('.', '/')]):
+            if is_pkg:
+                plugin_module = importlib.import_module(f'{plugins_package}.{plugin_name}')
+                for item_name in dir(plugin_module):
+                    item = getattr(plugin_module, item_name)
+                    try:
+                        if issubclass(item, (Command)):
+                            self.command_handler.register_command(plugin_name, item())
+                    except TypeError:
+                        continue
     def start(self):
+        self.load_plugins()
         print("Type 'exit' to exit.")
         while True:
-            user_input = input(">>> ").strip()
-            if user_input.lower() == "exit":
-                print("Exiting...")
-                break
-            self.command_handler.execute_command(user_input)
-
-
-
+            self.command_handler.execute_command(input(">>> ").strip())
