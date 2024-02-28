@@ -10,10 +10,13 @@ class CommandHandler:
         self.commands = {}
     def register_command(self, command_name: str, command: Command):
         self.commands[command_name] = command
-    def execute_command(self, command_name: str):
+    def execute_command(self, command_name: str,args=[]):
         try:
             # self.commands[command_name].execute()
-            process = multiprocessing.Process(target=self.commands[command_name].execute())
+            if (len(args) == 0):
+                process = multiprocessing.Process(target=self.commands[command_name].execute())
+            else:
+                process = multiprocessing.Process(target=self.commands[command_name].execute(args))
             process.start()
             process.join()
         except KeyError:
