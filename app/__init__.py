@@ -15,6 +15,7 @@ class App:
         self.settings = self.load_environment_variables()
         self.settings.setdefault('ENVIRONMENT', 'PRODUCTION')
         self.command_handler = CommandHandler()
+        self.commandList = []
 
     def configure_logging(self):
         logging_conf_path = 'logging.conf'
@@ -43,6 +44,7 @@ class App:
                 try:
                     plugin_module = importlib.import_module(f'{plugins_package}.{plugin_name}')
                     self.register_plugin_commands(plugin_module, plugin_name)
+                    self.commandList.append(plugin_name)
                 except ImportError as e:
                     logging.error(f"Error importing plugin {plugin_name}: {e}")
 
@@ -53,10 +55,10 @@ class App:
                 # Command names are now explicitly set to the plugin's folder name
                 self.command_handler.register_command(plugin_name, item())
                 logging.info(f"Command '{plugin_name}' from plugin '{plugin_name}' registered.")
-
     def start(self):
         self.load_plugins()
         logging.info("Application started. Type 'exit' to exit.")
+        logging.info("Type 'menu' to list all commands.")
         try:
             while True:
                 cmd_input = input(">>> ").strip()
@@ -64,7 +66,11 @@ class App:
                     logging.info("Application exit.")
                     sys.exit(0)  # Use sys.exit(0) for a clean exit, indicating success.
                 try:
-                    self.command_handler.execute_command(cmd_input)
+                    if (len(cmd_input.split(" ")) > 1):
+                        split = cmd_input.split(" ")
+                        self.command_handler.execute_command(split[0],list(filter(lambda x: not x.isspace(),split[1:])))
+                    else:
+                        self.command_handler.execute_command(cmd_input.strip())
                 except KeyError:  # Assuming execute_command raises KeyError for unknown commands
                     logging.error(f"Unknown command: {cmd_input}")
                     sys.exit(1)  # Use a non-zero exit code to indicate failure or incorrect command.
