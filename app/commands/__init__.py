@@ -12,7 +12,6 @@ class CommandHandler:
         self.commands[command_name] = command
     def execute_command(self, command_name: str,args=[]):
         try:
-            # self.commands[command_name].execute()
             if (len(args) == 0):
                 process = multiprocessing.Process(target=self.commands[command_name].execute())
             else:

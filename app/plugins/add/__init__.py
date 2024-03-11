@@ -21,14 +21,14 @@ class AddCommand(Command):
             print(res)
             logging.info("Command 'add' executed with arguments: " + str(args) + " and returned value \"" + str(res) + "\"")
         except InvalidOperation:
-            string = "["
-            for i in range(len(args)):
-                string += "\"" + args[i] + "\""
-                if (i < len(args)-1):
-                    string += ", "
-            string += "]"
-            print(f"Invalid number input: {string} does not include valid numbers.")
-            logging.info("Command 'add' error: " + f"Invalid number input: {string} does not include valid numbers.")
+            validList = list(filter(lambda x: x.isnumeric(), args))
+            invalidList = list(filter(lambda x: not x.isnumeric(), args))
+            print(f"Invalid number input: {args} does not include valid numbers.")
+            print(f"Valid numbers: {validList}.")
+            print(f"Invalid numbers: {invalidList}.")
+            logging.info("Command 'add' error: " + f"Invalid number input: {args} does not include valid numbers.")
+            logging.info("Command 'add' error: " + f"Valid numbers: {validList}")
+            logging.info("Command 'add' error: " + f"Invalid numbers: {invalidList}")
         except ZeroDivisionError:
             print("Error: Division by zero.")
             logging.info("Command 'add' error: " + "Error: Division by zero.")

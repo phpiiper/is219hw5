@@ -52,7 +52,6 @@ class App:
         for item_name in dir(plugin_module):
             item = getattr(plugin_module, item_name)
             if isinstance(item, type) and issubclass(item, Command) and item is not Command:
-                # Command names are now explicitly set to the plugin's folder name
                 self.command_handler.register_command(plugin_name, item())
                 logging.info(f"Command '{plugin_name}' from plugin '{plugin_name}' registered.")
     def start(self):
@@ -62,24 +61,24 @@ class App:
         try:
             while True:
                 cmd_input = input(">>> ").strip()
+                logging.info("Input: " + cmd_input)
                 if cmd_input.lower() == 'exit':
                     logging.info("Application exit.")
-                    sys.exit(0)  # Use sys.exit(0) for a clean exit, indicating success.
+                    sys.exit(0)
                 try:
                     if (len(cmd_input.split(" ")) > 1):
                         split = cmd_input.split(" ")
                         self.command_handler.execute_command(split[0],list(filter(lambda x: not x.isspace(),split[1:])))
                     else:
                         self.command_handler.execute_command(cmd_input.strip())
-                except KeyError:  # Assuming execute_command raises KeyError for unknown commands
+                except KeyError:
                     logging.error(f"Unknown command: {cmd_input}")
-                    sys.exit(1)  # Use a non-zero exit code to indicate failure or incorrect command.
+                    sys.exit(1)
         except KeyboardInterrupt:
             logging.info("Application interrupted and exiting gracefully.")
-            sys.exit(0)  # Assuming a KeyboardInterrupt should also result in a clean exit.
+            sys.exit(0)
         finally:
             logging.info("Application shutdown.")
-
 
 if __name__ == "__main__":
     app = App()

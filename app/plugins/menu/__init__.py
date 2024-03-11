@@ -21,8 +21,12 @@ class MenuCommand(Command):
         return arr
     def execute(self):
         commands = self.getList()
-        print(f'-----------------')
-        print(f'List of Commands:')
+        string = "\n"
+
+        string += '-----------------\n'
+        string += 'List of Commands: \n'
         for command in commands:
-            print(" > " + command)
-        print(f'-----------------')
+            string += " > " + command + "\n"
+        string += f'-----------------'
+        print(string)
+        logging.info(string)
